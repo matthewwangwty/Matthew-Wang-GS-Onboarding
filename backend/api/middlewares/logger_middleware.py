@@ -1,4 +1,6 @@
 from collections.abc import Callable
+import datetime
+import logging
 from typing import Any
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -17,6 +19,19 @@ class LoggerMiddleware(BaseHTTPMiddleware):
         :param call_next: Endpoint or next middleware to be called (if any, this is the next middleware in the chain of middlewares, it is supplied by FastAPI)
         :return: Response from endpoint
         """
-        # TODO:(Member) Finish implementing this method
+        start_time = datetime.datetime.now()
+        method = request.method
+        url = str(request.url)
+
+        logging.info(f"Incoming {method} request to {url}")
+        logging.info(f"Request started at: {start_time}")
+
         response = await call_next(request)
+
+        end_time = datetime.datetime.now()
+        duration = (end_time - start_time).total_seconds()
+
+        logging.info(f"Request completed with status {response.status_code}")
+        logging.info(f"Request duration: {duration:.3f} seconds")
+
         return response
